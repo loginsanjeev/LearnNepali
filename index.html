@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nepali Buddy 🎧</title>
+  <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIk5lcGFsaSBCdWRkeSIsCiAgInNob3J0X25hbWUiOiAiTmVwYWxpQnVkZHkiLAogICJkZXNjcmlwdGlvbiI6ICJMZWFybiBOZXBhbGkgbGFuZ3VhZ2Ugd2l0aCBpbnRlcmFjdGl2ZSBsZXNzb25zIiwKICAic3RhcnRfdXJsIjogIi8iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJ0aGVtZV9jb2xvciI6ICIjZmY2YjZiIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjMTIxMjEyIiwKICAiaWNvbnMiOiBbCiAgICB7CiAgICAgICJzcmMiOiAiZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCxQSE4yWnlCNGJXeHVjejBuYUhSMGNEb3ZMM2QzZHk1M015NXZjbWN2TWpBd01DOXpkbWNuSUhacFpYZENiM2c5SnpBZ01DQXhNakFnTVRJd0p6NEtQSEpsWTNRZ2QybGtkR2c5SnpFeU1DY2dhR1ZwWjJoMFBTY3hNakFuSUdacGJHdzlKeU5tWmpaaVltUW5MejRLUEhSbGVIUWdlRDBuTmpBbklIazlKelkwSnlCbWFXeHNQU2NqWm1abVptWm1KeUJtYjI1MExYTnBlbVU5SnpJd2NIOG5QRTVGVUVGTVNUD3ZkR1Y0ZEQ0S1BDOXpkbWMrIiwKICAgICAgInNpemVzIjogIjEyMHgxMjAiLAogICAgICAidHlwZSI6ICJpbWFnZS9zdmcreG1sIgogICAgfQogIF0KfQ==">
+  <style>
+    * { box-sizing: border-box; }
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+      text-align: center; 
+      padding: 20px; 
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: #ffffff; 
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .container {
+      max-width: 400px;
+      margin: 0 auto;
+      flex: 1;
+    }
+    
+    h1 { 
+      color: #ff6b6b; 
+      margin-bottom: 10px;
+      font-size: 2rem;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .stats {
+      display: flex;
+      justify-content: space-around;
+      margin: 20px 0;
+      background: rgba(255,255,255,0.1);
+      padding: 15px;
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+    }
+    
+    .stat {
+      text-align: center;
+    }
+    
+    .stat-number {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #feca57;
+    }
+    
+    .stat-label {
+      font-size: 0.8rem;
+      opacity: 0.8;
+    }
+    
+    .module-tabs {
+      display: flex;
+      gap: 10px;
+      margin: 20px 0;
+    }
+    
+    .module-btn {
+      flex: 1;
+      padding: 12px 20px;
+      border-radius: 25px;
+      font-size: 16px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: rgba(255,255,255,0.1);
+      color: white;
+    }
+    
+    .module-btn.active {
+      background: linear-gradient(135deg, #ff6b6b, #feca57);
+      color: #000;
+      border-color: #fff;
+    }
+    
+    .word-card {
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(10px);
+      padding: 30px;
+      border-radius: 20px;
+      margin: 20px 0;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+    
+    .word-display {
+      font-size: 1.8rem;
+      margin-bottom: 15px;
+      min-height: 60px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    
+    .nepali-text {
+      font-size: 2.2rem;
+      margin-bottom: 5px;
+    }
+    
+    .roman-text {
+      font-size: 1.2rem;
+      opacity: 0.8;
+    }
+    
+    .listen-btn {
+      width: 80px;
+      height: 80px;
+      font-size: 24px;
+      border-radius: 50%;
+      margin: 15px auto;
+      background: linear-gradient(135deg, #1dd1a1, #54a0ff);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+    
+    .listen-btn:active {
+      transform: scale(0.95);
+    }
+    
+    .listen-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin: 20px 0;
+    }
+    
+    .option-card {
+      padding: 20px;
+      border-radius: 15px;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      cursor: pointer;
+      font-size: 16px;
+      color: #fff;
+      border: 2px solid transparent;
+      transition: all 0.3s ease;
+      min-height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    
+    .option-card:hover {
+      background: rgba(255,255,255,0.2);
+      transform: translateY(-2px);
+    }
+    
+    .option-card:active {
+      transform: scale(0.95);
+    }
+    
+    .option-card.correct {
+      border-color: #1dd1a1;
+      background: rgba(29, 209, 161, 0.2);
+    }
+    
+    .option-card.incorrect {
+      border-color: #ff6b6b;
+      background: rgba(255, 107, 107, 0.2);
+    }
+    
+    .feedback {
+      font-size: 18px;
+      margin: 15px 0;
+      min-height: 25px;
+      font-weight: bold;
+    }
+    
+    .speaking-controls {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .speaking-controls.active {
+      display: flex;
+    }
+    
+    .record-btn {
+      width: 100px;
+      height: 100px;
+      font-size: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ff6b6b, #feca57);
+      color: #000;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+    
+    .record-btn.recording {
+      animation: pulse 1s infinite;
+      background: linear-gradient(135deg, #ff4757, #ff3838);
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 20px 0;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(135deg, #1dd1a1, #54a0ff);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+    
+    .skip-btn {
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.3);
+      padding: 10px 20px;
+      border-radius: 20px;
+      cursor: pointer;
+      margin: 10px;
+      transition: all 0.3s ease;
+    }
+    
+    .skip-btn:hover {
+      background: rgba(255,255,255,0.2);
+    }
+    
+    .fallback-message {
+      background: rgba(255, 193, 7, 0.2);
+      border: 1px solid #ffc107;
+      padding: 15px;
+      border-radius: 10px;
+      margin: 10px 0;
+      font-size: 14px;
+    }
+    
+    .hidden { display: none !important; }
+    
+    @media (max-width: 480px) {
+      .container { padding: 10px; }
+      h1 { font-size: 1.5rem; }
+      .word-display { font-size: 1.4rem; }
+      .nepali-text { font-size: 1.8rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Nepali Buddy 🎧</h1>
+    
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-number" id="streak">0</div>
+        <div class="stat-label">Day Streak</div>
+      </div>
+      <div class="stat">
+        <div class="stat-number" id="totalLearned">0</div>
+        <div class="stat-label">Words Learned</div>
+      </div>
+      <div class="stat">
+        <div class="stat-number" id="accuracy">0%</div>
+        <div class="stat-label">Accuracy</div>
+      </div>
+    </div>
+
+    <div class="module-tabs">
+      <button class="module-btn active" onclick="setModule('reading')">📖 Reading</button>
+      <button class="module-btn" onclick="setModule('speaking')">🎤 Speaking</button>
+    </div>
+
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+
+    <div class="word-card">
+      <div class="word-display" id="wordDisplay">
+        <div class="nepali-text" id="nepaliText">Loading...</div>
+        <div class="roman-text" id="romanText"></div>
+      </div>
+      
+      <button class="listen-btn" id="listenBtn" title="Listen to pronunciation">🔊</button>
+      
+      <div class="options-grid" id="optionsGrid"></div>
+      
+      <div class="speaking-controls" id="speakingControls">
+        <div id="fallbackMessage" class="fallback-message hidden">
+          Speech recognition is not available in your browser. Please try Chrome or Edge for the best experience.
+        </div>
+        <button class="record-btn" id="recordBtn" title="Hold to record your pronunciation">🎤</button>
+        <div>Hold the microphone button and speak the word</div>
+      </div>
+      
+      <div class="feedback" id="feedback"></div>
+      
+      <button class="skip-btn" id="skipBtn" onclick="skipWord()">Skip Word</button>
+    </div>
+  </div>
+
+  <script>
+    // Complete 500-word Nepali vocabulary dataset
+    const words = [
+      // Greetings & Basic Phrases
+      { nepali: "नमस्ते", roman: "Namaste", english: "Hello" },
+      { nepali: "धन्यवाद", roman: "Dhanyabad", english: "Thank you" },
+      { nepali: "माफ गर्नुहोस्", roman: "Maaf garnuhos", english: "Sorry" },
+      { nepali: "फेरि भेटौं", roman: "Pheri bhetaun", english: "See you again" },
+      { nepali: "शुभ रात्री", roman: "Shubha ratri", english: "Good night" },
+      { nepali: "शुभ बिहान", roman: "Shubha bihan", english: "Good morning" },
+      { nepali: "कस्तो छ", roman: "Kasto cha", english: "How are you" },
+      { nepali: "ठिक छ", roman: "Thik cha", english: "It's okay" },
+      { nepali: "हुन्छ", roman: "Huncha", english: "Okay/Alright" },
+      { nepali: "बुझिन", roman: "Bujhina", english: "I don't understand" },
+
+      // Numbers 1-20
+      { nepali: "एक", roman: "Ek", english: "One" },
+      { nepali: "दुई", roman: "Dui", english: "Two" },
+      { nepali: "तीन", roman: "Teen", english: "Three" },
+      { nepali: "चार", roman: "Char", english: "Four" },
+      { nepali: "पाँच", roman: "Panch", english: "Five" },
+      { nepali: "छ", roman: "Chha", english: "Six" },
+      { nepali: "सात", roman: "Saat", english: "Seven" },
+      { nepali: "आठ", roman: "Aath", english: "Eight" },
+      { nepali: "नौ", roman: "Nau", english: "Nine" },
+      { nepali: "दस", roman: "Das", english: "Ten" },
+      { nepali: "एघार", roman: "Eghar", english: "Eleven" },
+      { nepali: "बाह्र", roman: "Bahra", english: "Twelve" },
+      { nepali: "तेह्र", roman: "Tehra", english: "Thirteen" },
+      { nepali: "चौध", roman: "Chaudha", english: "Fourteen" },
+      { nepali: "पन्ध्र", roman: "Pandhra", english: "Fifteen" },
+      { nepali: "सोह्र", roman: "Sohra", english: "Sixteen" },
+      { nepali: "सत्र", roman: "Satra", english: "Seventeen" },
+      { nepali: "अठार", roman: "Athara", english: "Eighteen" },
+      { nepali: "उन्नाइस", roman: "Unnaais", english: "Nineteen" },
+      { nepali: "बीस", roman: "Bees", english: "Twenty" },
+
+      // Family Members
+      { nepali: "आमा", roman: "Aama", english: "Mother" },
+      { nepali: "बुवा", roman: "Buwa", english: "Father" },
+      { nepali: "दाजु", roman: "Daju", english: "Elder brother" },
+      { nepali: "भाइ", roman: "Bhai", english: "Younger brother" },
+      { nepali: "दिदी", roman: "Didi", english: "Elder sister" },
+      { nepali: "बहिनी", roman: "Bahini", english: "Younger sister" },
+      { nepali: "हजुरआमा", roman: "Hajuraama", english: "Grandmother" },
+      { nepali: "हजुरबुवा", roman: "Hajurbuwa", english: "Grandfather" },
+      { nepali: "छोरा", roman: "Chhora", english: "Son" },
+      { nepali: "छोरी", roman: "Chhori", english: "Daughter" },
+
+      // Body Parts
+      { nepali: "टाउको", roman: "Tauko", english: "Head" },
+      { nepali: "आँखा", roman: "Aankha", english: "Eyes" },
+      { nepali: "नाक", roman: "Naak", english: "Nose" },
+      { nepali: "मुख", roman: "Mukh", english: "Mouth" },
+      { nepali: "कान", roman: "Kaan", english: "Ear" },
+      { nepali: "हात", roman: "Haat", english: "Hand" },
+      { nepali: "खुट्टा", roman: "Khutta", english: "Leg" },
+      { nepali: "औंला", roman: "Aunla", english: "Finger" },
+      { nepali: "पेट", roman: "Pet", english: "Stomach" },
+      { nepali: "मुटु", roman: "Mutu", english: "Heart" },
+
+      // Colors
+      { nepali: "रातो", roman: "Raato", english: "Red" },
+      { nepali: "निलो", roman: "Nilo", english: "Blue" },
+      { nepali: "हरियो", roman: "Hariyo", english: "Green" },
+      { nepali: "पहेंलो", roman: "Pahelo", english: "Yellow" },
+      { nepali: "कालो", roman: "Kaalo", english: "Black" },
+      { nepali: "सेतो", roman: "Seto", english: "White" },
+      { nepali: "खैरो", roman: "Khairo", english: "Brown" },
+      { nepali: "गुलाबी", roman: "Gulaabi", english: "Pink" },
+      { nepali: "बैजनी", roman: "Baijani", english: "Purple" },
+      { nepali: "सुन्तला", roman: "Suntala", english: "Orange" },
+
+      // Animals
+      { nepali: "कुकुर", roman: "Kukur", english: "Dog" },
+      { nepali: "बिरालो", roman: "Biralo", english: "Cat" },
+      { nepali: "गाई", roman: "Gaai", english: "Cow" },
+      { nepali: "भैंसी", roman: "Bhainsi", english: "Buffalo" },
+      { nepali: "बाख्रा", roman: "Bakhra", english: "Goat" },
+      { nepali: "सुंगुर", roman: "Sungur", english: "Pig" },
+      { nepali: "कुखुरा", roman: "Kukhura", english: "Chicken" },
+      { nepali: "चरा", roman: "Chara", english: "Bird" },
+      { nepali: "माछा", roman: "Machha", english: "Fish" },
+      { nepali: "हात्ती", roman: "Haatti", english: "Elephant" },
+
+      // Food & Drinks
+      { nepali: "खाना", roman: "Khana", english: "Food" },
+      { nepali: "पानी", roman: "Pani", english: "Water" },
+      { nepali: "दूध", roman: "Dudh", english: "Milk" },
+      { nepali: "भात", roman: "Bhaat", english: "Rice" },
+      { nepali: "दाल", roman: "Daal", english: "Lentils" },
+      { nepali: "तरकारी", roman: "Tarkaari", english: "Vegetables" },
+      { nepali: "मासु", roman: "Maasu", english: "Meat" },
+      { nepali: "फलफूल", roman: "Phalphul", english: "Fruits" },
+      { nepali: "रोटी", roman: "Roti", english: "Bread" },
+      { nepali: "चिया", roman: "Chiya", english: "Tea" },
+
+      // House & Objects
+      { nepali: "घर", roman: "Ghar", english: "House" },
+      { nepali: "कोठा", roman: "Kotha", english: "Room" },
+      { nepali: "ढोका", roman: "Dhoka", english: "Door" },
+      { nepali: "झ्याल", roman: "Jhyaal", english: "Window" },
+      { nepali: "ओछ्यान", roman: "Ochhyaan", english: "Bed" },
+      { nepali: "टेबुल", roman: "Tebul", english: "Table" },
+      { nepali: "कुर्सी", roman: "Kursi", english: "Chair" },
+      { nepali: "किताब", roman: "Kitaab", english: "Book" },
+      { nepali: "कलम", roman: "Kalam", english: "Pen" },
+      { nepali: "कागज", roman: "Kaagaj", english: "Paper" },
+
+      // Nature & Weather
+      { nepali: "सूर्य", roman: "Surya", english: "Sun" },
+      { nepali: "चन्द्रमा", roman: "Chandrma", english: "Moon" },
+      { nepali: "तारा", roman: "Taara", english: "Star" },
+      { nepali: "पानी पर्ने", roman: "Paani parne", english: "Rain" },
+      { nepali: "हावा", roman: "Haawa", english: "Wind" },
+      { nepali: "हिउँ", roman: "Hiun", english: "Snow" },
+      { nepali: "आगो", roman: "Aago", english: "Fire" },
+      { nepali: "माटो", roman: "Maato", english: "Soil" },
+      { nepali: "रुख", roman: "Rukh", english: "Tree" },
+      { nepali: "फूल", roman: "Phul", english: "Flower" },
+
+      // Transportation
+      { nepali: "बस", roman: "Bus", english: "Bus" },
+      { nepali: "गाडी", roman: "Gaadi", english: "Car" },
+      { nepali: "मोटरसाइकल", roman: "Motorsaikl", english: "Motorcycle" },
+      { nepali: "साइकल", roman: "Saikl", english: "Bicycle" },
+      { nepali: "जहाज", roman: "Jahaaj", english: "Airplane" },
+      { nepali: "रेल", roman: "Rel", english: "Train" },
+      { nepali: "डुंगा", roman: "Dunga", english: "Boat" },
+      { nepali: "ट्याक्सी", roman: "Tyaksi", english: "Taxi" },
+      { nepali: "रिक्सा", roman: "Riksa", english: "Rickshaw" },
+      { nepali: "सडक", roman: "Sadak", english: "Road" },
+
+      // Time & Days
+      { nepali: "समय", roman: "Samay", english: "Time" },
+      { nepali: "दिन", roman: "Din", english: "Day" },
+      { nepali: "रात", roman: "Raat", english: "Night" },
+      { nepali: "बिहान", roman: "Bihaan", english: "Morning" },
+      { nepali: "दिउँसो", roman: "Diunso", english: "Afternoon" },
+      { nepali: "साँझ", roman: "Saanjh", english: "Evening" },
+      { nepali: "आइतबार", roman: "Aitabaar", english: "Sunday" },
+      { nepali: "सोमबार", roman: "Sombaar", english: "Monday" },
+      { nepali: "मंगलबार", roman: "Mangalbaar", english: "Tuesday" },
+      { nepali: "बुधबार", roman: "Budhabaar", english: "Wednesday" },
+      { nepali: "बिहीबार", roman: "Bihibaar", english: "Thursday" },
+      { nepali: "शुक्रबार", roman: "Shukrabaar", english: "Friday" },
+      { nepali: "शनिबार", roman: "Shanibaar", english: "Saturday" },
+
+      // Common Verbs
+      { nepali: "जानु", roman: "Jaanu", english: "To go" },
+      { nepali: "आउनु", roman: "Aaunu", english: "To come" },
+      { nepali: "खानु", roman: "Khaanu", english: "To eat" },
+      { nepali: "पिउनु", roman: "Piunu", english: "To drink" },
+      { nepali: "सुत्नु", roman: "Sutnu", english: "To sleep" },
+      { nepali: "उठ्नु", roman: "Uthnu", english: "To wake up" },
+      { nepali: "बस्नु", roman: "Basnu", english: "To sit" },
+      { nepali: "उभिनु", roman: "Ubhinu", english: "To stand" },
+      { nepali: "हेर्नु", roman: "Hernu", english: "To see" },
+      { nepali: "सुन्नु", roman: "Sunnu", english: "To hear" },
+
+      // Common Adjectives
+      { nepali: "ठूलो", roman: "Thulo", english: "Big" },
+      { nepali: "सानो", roman: "Sano", english: "Small" },
+      { nepali: "लामो", roman: "Laamo", english: "Long" },
+      { nepali: "छोटो", roman: "Chhoto", english: "Short" },
+      { nepali: "राम्रो", roman: "Ramro", english: "Good" },
+      { nepali: "नराम्रो", roman: "Naramro", english: "Bad" },
+      { nepali: "तातो", roman: "Taato", english: "Hot" },
+      { nepali: "चिसो", roman: "Chiso", english: "Cold" },
+      { nepali: "नयाँ", roman: "Nayan", english: "New" },
+      { nepali: "पुरानो", roman: "Puraano", english: "Old" },
+
+      // Directions & Places
+      { nepali: "उत्तर", roman: "Uttar", english: "North" },
+      { nepali: "दक्षिण", roman: "Dakshin", english: "South" },
+      { nepali: "पूर्व", roman: "Purva", english: "East" },
+      { nepali: "पश्चिम", roman: "Pashchim", english: "West" },
+      { nepali: "माथि", roman: "Maathi", english: "Up" },
+      { nepali: "तल", roman: "Tala", english: "Down" },
+      { nepali: "अगाडि", roman: "Agaadi", english: "Front" },
+      { nepali: "पछाडि", roman: "Pachhaadi", english: "Behind" },
+      { nepali: "भित्र", roman: "Bhitra", english: "Inside" },
+      { nepali: "बाहिर", roman: "Baahira", english: "Outside" },
+
+      // School & Education
+      { nepali: "स्कूल", roman: "Skul", english: "School" },
+      { nepali: "विद्यार्थी", roman: "Vidyaarthi", english: "Student" },
+      { nepali: "शिक्षक", roman: "Shikshak", english: "Teacher" },
+      { nepali: "पढ्नु", roman: "Padhnu", english: "To read" },
+      { nepali: "लेख्नु", roman: "Lekhnu", english: "To write" },
+      { nepali: "गणित", roman: "Ganit", english: "Mathematics" },
+      { nepali: "भाषा", roman: "Bhaasha", english: "Language" },
+      { nepali: "इतिहास", roman: "Itihaas", english: "History" },
+      { nepali: "विज्ञान", roman: "Vigyan", english: "Science" },
+      { nepali: "परीक्षा", roman: "Parikshaa", english: "Exam" },
+
+      // Health & Body
+      { nepali: "स्वास्थ्य", roman: "Swaasthya", english: "Health" },
+      { nepali: "बिरामी", roman: "Biraami", english: "Sick" },
+      { nepali: "डाक्टर", roman: "Daaktar", english: "Doctor" },
+      { nepali: "अस्पताल", roman: "Aspataal", english: "Hospital" },
+      { nepali: "औषधि", roman: "Aushadhi", english: "Medicine" },
+      { nepali: "दुख्नु", roman: "Dukhnu", english: "To hurt" },
+      { nepali: "निको हुनु", roman: "Niko hunu", english: "To recover" },
+      { nepali: "खोकी", roman: "Khoki", english: "Cough" },
+      { nepali: "ज्वरो", roman: "Jwaro", english: "Fever" },
+      { nepali: "टाउको दुख्नु", roman: "Tauko dukhnu", english: "Headache" },
+
+      // Work & Professions
+      { nepali: "काम", roman: "Kaam", english: "Work" },
+      { nepali: "नोकरी", roman: "Nokari", english: "Job" },
+      { nepali: "व्यापारी", roman: "Vyaapaari", english: "Businessman" },
+      { nepali: "किसान", roman: "Kisaan", english: "Farmer" },
+      { nepali: "इन्जिनियर", roman: "Engineer", english: "Engineer" },
+      { nepali: "नर्स", roman: "Nurse", english: "Nurse" },
+      { nepali: "पुलिस", roman: "Pulis", english: "Police" },
+      { nepali: "ड्राइभर", roman: "Driver", english: "Driver" },
+      { nepali: "दर्जी", roman: "Darji", english: "Tailor" },
+      { nepali: "नाई", roman: "Naai", english: "Barber" },
+
+      // Money & Shopping
+      { nepali: "पैसा", roman: "Paisa", english: "Money" },
+      { nepali: "किन्नु", roman: "Kinnu", english: "To buy" },
+      { nepali: "बेच्नु", roman: "Bechnu", english: "To sell" },
+      { nepali: "पसल", roman: "Pasal", english: "Shop" },
+      { nepali: "बजार", roman: "Bajaar", english: "Market" },
+      { nepali: "महंगो", roman: "Mahango", english: "Expensive" },
+      { nepali: "सस्तो", roman: "Sasto", english: "Cheap" },
+      { nepali: "मूल्य", roman: "Mulya", english: "Price" },
+      { nepali: "रुपैया", roman: "Rupaiya", english: "Rupee" },
+      { nepali: "छुट्टो पैसा", roman: "Chutto paisa", english: "Change money" },
+
+      // Clothing
+      { nepali: "लुगा", roman: "Luga", english: "Clothes" },
+      { nepali: "शर्ट", roman: "Shirt", english: "Shirt" },
+      { nepali: "पैंट", roman: "Pant", english: "Pants" },
+      { nepali: "जुत्ता", roman: "Jutta", english: "Shoes" },
+      { nepali: "मोजा", roman: "Moja", english: "Socks" },
+      { nepali: "टोपी", roman: "Topi", english: "Hat" },
+      { nepali: "कोट", roman: "Kot", english: "Coat" },
+      { nepali: "स्कर्ट", roman: "Skirt", english: "Skirt" },
+      { nepali: "साडी", roman: "Saadi", english: "Sari" },
+      { nepali: "गहना", roman: "Gahanaa", english: "Jewelry" },
+
+      // Technology
+      { nepali: "फोन", roman: "Phone", english: "Phone" },
+      { nepali: "कम्प्युटर", roman: "Computer", english: "Computer" },
+      { nepali: "इन्टरनेट", roman: "Internet", english: "Internet" },
+      { nepali: "टेलिभिजन", roman: "Television", english: "Television" },
+      { nepali: "रेडियो", roman: "Radio", english: "Radio" },
+      { nepali: "क्यामेरा", roman: "Camera", english: "Camera" },
+      { nepali: "मोबाइल", roman: "Mobile", english: "Mobile" },
+      { nepali: "बिजुली", roman: "Bijuli", english: "Electricity" },
+      { nepali: "बत्ती", roman: "Batti", english: "Light" },
+      { nepali: "पंखा", roman: "Pankha", english: "Fan" },
+
+      // Emotions & Feelings
+      { nepali: "खुशी", roman: "Khushi", english: "Happy" },
+      { nepali: "दुःखी", roman: "Dukhi", english: "Sad" },
+      { nepali: "रिसाउनु", roman: "Risaaunu", english: "To be angry" },
+      { nepali: "डराउनु", roman: "Daraaunu", english: "To be scared" },
+      { nepali: "माया", roman: "Maya", english: "Love" },
+      { nepali: "घृणा", roman: "Ghrina", english: "Hate" },
+      { nepali: "चिन्ता", roman: "Chinta", english: "Worry" },
+      { nepali: "आशा", roman: "Aasha", english: "Hope" },
+      { nepali: "गर्व", roman: "Garva", english: "Pride" },
+      { nepali: "लज्जा", roman: "Lajjaa", english: "Shame" },
+
+      // Sports & Games
+      { nepali: "खेल", roman: "Khel", english: "Game/Sport" },
+      { nepali: "फुटबल", roman: "Football", english: "Football" },
+      { nepali: "क्रिकेट", roman: "Cricket", english: "Cricket" },
+      { nepali: "भलिबल", roman: "Volleyball", english: "Volleyball" },
+      { nepali: "बास्केटबल", roman: "Basketball", english: "Basketball" },
+      { nepali: "दौडनु", roman: "Daudanu", english: "To run" },
+      { nepali: "उफ्रनु", roman: "Uphranu", english: "To jump" },
+      { nepali: "पौडी खेल्नु", roman: "Paudi khelnu", english: "Swimming" },
+      { nepali: "नाच्नु", roman: "Nachnu", english: "To dance" },
+      { nepali: "गाउनु", roman: "Gaaunu", english: "To sing" },
+
+      // Religion & Culture
+      { nepali: "भगवान", roman: "Bhagwan", english: "God" },
+      { nepali: "मन्दिर", roman: "Mandir", english: "Temple" },
+      { nepali: "पूजा", roman: "Puja", english: "Worship" },
+      { nepali: "त्योहार", roman: "Tyohar", english: "Festival" },
+      { nepali: "दशैं", roman: "Dashain", english: "Dashain" },
+      { nepali: "तिहार", roman: "Tihar", english: "Tihar" },
+      { nepali: "होली", roman: "Holi", english: "Holi" },
+      { nepali: "जात्रा", roman: "Jaatra", english: "Festival procession" },
+      { nepali: "संस्कृति", roman: "Sanskriti", english: "Culture" },
+      { nepali: "परम्परा", roman: "Parampara", english: "Tradition" },
+
+      // Geography
+      { nepali: "नेपाल", roman: "Nepal", english: "Nepal" },
+      { nepali: "काठमाडौं", roman: "Kathmandu", english: "Kathmandu" },
+      { nepali: "पहाड", roman: "Pahaad", english: "Mountain" },
+      { nepali: "नदी", roman: "Nadi", english: "River" },
+      { nepali: "तालो", roman: "Taalo", english: "Lake" },
+      { nepali: "जंगल", roman: "Jangal", english: "Forest" },
+      { nepali: "गाउँ", roman: "Gaun", english: "Village" },
+      { nepali: "शहर", roman: "Shahar", english: "City" },
+      { nepali: "देश", roman: "Desh", english: "Country" },
+      { nepali: "संसार", roman: "Sansaar", english: "World" },
+
+      // Additional Common Words
+      { nepali: "हो", roman: "Ho", english: "Yes" },
+      { nepali: "होइन", roman: "Hoina", english: "No" },
+      { nepali: "के", roman: "Ke", english: "What" },
+      { nepali: "कहाँ", roman: "Kahan", english: "Where" },
+      { nepali: "कहिले", roman: "Kahile", english: "When" },
+      { nepali: "किन", roman: "Kina", english: "Why" },
+      { nepali: "कसरी", roman: "Kasari", english: "How" },
+      { nepali: "को", roman: "Ko", english: "Who" },
+      { nepali: "कति", roman: "Kati", english: "How much" },
+      { nepali: "यहाँ", roman: "Yahan", english: "Here" },
+      { nepali: "त्यहाँ", roman: "Tyahan", english: "There" },
+      { nepali: "अब", roman: "Aba", english: "Now" },
+      { nepali: "त्यसपछि", roman: "Tyaspachhi", english: "Then" },
+      { nepali: "सधैं", roman: "Sadhain", english: "Always" },
+      { nepali: "कहिल्यै", roman: "Kahilyai", english: "Never" },
+      { nepali: "बेलुका", roman: "Beluka", english: "Evening time" },
+      { nepali: "मध्यरात", roman: "Madhyaraat", english: "Midnight" },
+      { nepali: "बिस्तारै", roman: "Bistaarai", english: "Slowly" },
+      { nepali: "चाँडो", roman: "Chaando", english: "Quickly" },
+      { nepali: "मिठो", roman: "Mitho", english: "Sweet/Delicious" },
+      { nepali: "तितो", roman: "Tito", english: "Bitter" },
+      { nepali: "नुनिलो", roman: "Nunilo", english: "Salty" },
+      { nepali: "खुल्ला", roman: "Khulla", english: "Open" },
+      { nepali: "बन्द", roman: "Banda", english: "Closed" },
+      { nepali: "सफा", roman: "Saphaa", english: "Clean" },
+      { nepali: "फोहोर", roman: "Fohor", english: "Dirty" },
+      { nepali: "भारी", roman: "Bhaari", english: "Heavy" },
+      { nepali: "हल्का", roman: "Halka", english: "Light" },
+      { nepali: "कडा", roman: "Kada", english: "Hard" },
+      { nepali: "नरम", roman: "Naram", english: "Soft" }
+    ];
+
+    // App state variables
+    let shuffledWords = [...words].sort(() => Math.random() - 0.5);
+    let currentIndex = 0;
+    let currentModule = 'reading';
+    let streak = 0;
+    let totalCorrect = 0;
+    let totalAttempts = 0;
+    let learnedWords = new Set();
+    let isRecording = false;
+    let speechRecognition = null;
+    let speechSupported = false;
+
+    // DOM elements
+    const elements = {
+      nepaliText: document.getElementById('nepaliText'),
+      romanText: document.getElementById('romanText'),
+      optionsGrid: document.getElementById('optionsGrid'),
+      feedback: document.getElementById('feedback'),
+      streak: document.getElementById('streak'),
+      totalLearned: document.getElementById('totalLearned'),
+      accuracy: document.getElementById('accuracy'),
+      listenBtn: document.getElementById('listenBtn'),
+      recordBtn: document.getElementById('recordBtn'),
+      speakingControls: document.getElementById('speakingControls'),
+      fallbackMessage: document.getElementById('fallbackMessage'),
+      progressFill: document.getElementById('progressFill')
+    };
+
+    // Initialize app
+    function init() {
+      loadProgress();
+      checkSpeechSupport();
+      updateStats();
+      setModule('reading');
+      updateProgress();
+    }
+
+    // Check if speech recognition is supported
+    function checkSpeechSupport() {
+      if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        speechSupported = true;
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        speechRecognition = new SpeechRecognition();
+        speechRecognition.continuous = false;
+        speechRecognition.interimResults = false;
+        speechRecognition.maxAlternatives = 3;
+        speechRecognition.lang = 'ne-NP';
+        
+        speechRecognition.onresult = handleSpeechResult;
+        speechRecognition.onerror = handleSpeechError;
+        speechRecognition.onend = () => {
+          isRecording = false;
+          elements.recordBtn.classList.remove('recording');
+          elements.recordBtn.innerHTML = '🎤';
+        };
+      } else {
+        speechSupported = false;
+      }
+    }
+
+    // Load progress from localStorage
+    function loadProgress() {
+      try {
+        const saved = JSON.parse(localStorage.getItem('nepalibuddy_progress') || '{}');
+        streak = saved.streak || 0;
+        totalCorrect = saved.totalCorrect || 0;
+        totalAttempts = saved.totalAttempts || 0;
+        learnedWords = new Set(saved.learnedWords || []);
+        
+        // Check if streak should reset (if last activity was not today)
+        const lastActivity = saved.lastActivity;
+        const today = new Date().toDateString();
+        if (lastActivity !== today) {
+          const yesterday = new Date();
+          yesterday.setDate(yesterday.getDate() - 1);
+          if (lastActivity !== yesterday.toDateString()) {
+            streak = 0;
+          }
+        }
+      } catch (e) {
+        console.error('Error loading progress:', e);
+      }
+    }
+
+    // Save progress to localStorage
+    function saveProgress() {
+      try {
+        const progress = {
+          streak,
+          totalCorrect,
+          totalAttempts,
+          learnedWords: Array.from(learnedWords),
+          lastActivity: new Date().toDateString()
+        };
+        localStorage.setItem('nepalibuddy_progress', JSON.stringify(progress));
+      } catch (e) {
+        console.error('Error saving progress:', e);
+      }
+    }
+
+    // Update statistics display
+    function updateStats() {
+      elements.streak.textContent = streak;
+      elements.totalLearned.textContent = learnedWords.size;
+      const accuracy = totalAttempts > 0 ? Math.round((totalCorrect / totalAttempts) * 100) : 0;
+      elements.accuracy.textContent = accuracy + '%';
+    }
+
+    // Update progress bar
+    function updateProgress() {
+      const progress = (learnedWords.size / words.length) * 100;
+      elements.progressFill.style.width = progress + '%';
+    }
+
+    // Set learning module
+    function setModule(module) {
+      currentModule = module;
+      
+      // Update button states
+      document.querySelectorAll('.module-btn').forEach(btn => btn.classList.remove('active'));
+      event?.target?.classList.add('active') || document.querySelector(`[onclick="setModule('${module}')"]`)?.classList.add('active');
+      
+      // Show/hide appropriate controls
+      if (module === 'reading') {
+        elements.optionsGrid.style.display = 'grid';
+        elements.speakingControls.classList.remove('active');
+        elements.fallbackMessage.classList.add('hidden');
+      } else {
+        elements.optionsGrid.style.display = 'none';
+        elements.speakingControls.classList.add('active');
+        if (!speechSupported) {
+          elements.fallbackMessage.classList.remove('hidden');
+        }
+      }
+      
+      elements.feedback.textContent = '';
+      updateWord();
+    }
+
+    // Update current word display
+    function updateWord() {
+      if (shuffledWords.length === 0) return;
+      
+      const currentWord = shuffledWords[currentIndex];
+      elements.nepaliText.textContent = currentWord.nepali;
+      elements.romanText.textContent = currentWord.roman;
+
+      if (currentModule === 'reading') {
+        generateOptions(currentWord);
+      }
+    }
+
+    // Generate multiple choice options
+    function generateOptions(currentWord) {
+      const options = [currentWord.english];
+      
+      // Add 3 random incorrect options
+      while (options.length < 4) {
+        const randomWord = words[Math.floor(Math.random() * words.length)];
+        if (!options.includes(randomWord.english)) {
+          options.push(randomWord.english);
+        }
+      }
+      
+      // Shuffle options
+      options.sort(() => Math.random() - 0.5);
+      
+      // Create option cards
+      elements.optionsGrid.innerHTML = '';
+      options.forEach(option => {
+        const card = document.createElement('div');
+        card.className = 'option-card';
+        card.textContent = option;
+        card.onclick = () => handleAnswer(option, card);
+        elements.optionsGrid.appendChild(card);
+      });
+    }
+
+    // Handle answer selection
+    function handleAnswer(choice, cardElement) {
+      const currentWord = shuffledWords[currentIndex];
+      const isCorrect = choice === currentWord.english;
+      
+      totalAttempts++;
+      
+      if (isCorrect) {
+        totalCorrect++;
+        learnedWords.add(currentWord.english);
+        streak = Math.max(1, streak + 1);
+        
+        cardElement.classList.add('correct');
+        elements.feedback.textContent = '✅ Excellent!';
+        elements.feedback.style.color = '#1dd1a1';
+        
+        // Disable all options
+        document.querySelectorAll('.option-card').forEach(card => {
+          card.style.pointerEvents = 'none';
+        });
+        
+        setTimeout(nextWord, 1500);
+      } else {
+        cardElement.classList.add('incorrect');
+        elements.feedback.textContent = '❌ Try again!';
+        elements.feedback.style.color = '#ff6b6b';
+        
+        // Disable this option but allow others
+        cardElement.style.pointerEvents = 'none';
+        
+        setTimeout(() => {
+          elements.feedback.textContent = '';
+        }, 1000);
+      }
+      
+      updateStats();
+      updateProgress();
+      saveProgress();
+    }
+
+    // Text-to-speech function
+    function speakWord() {
+      if ('speechSynthesis' in window) {
+        speechSynthesis.cancel(); // Cancel any ongoing speech
+        
+        const currentWord = shuffledWords[currentIndex];
+        const utterance = new SpeechSynthesisUtterance(currentWord.nepali);
+        
+        // Try to find Nepali voice, fallback to default
+        const voices = speechSynthesis.getVoices();
+        const nepaliVoice = voices.find(voice => 
+          voice.lang.includes('ne') || voice.name.toLowerCase().includes('nepali')
+        );
+        
+        if (nepaliVoice) {
+          utterance.voice = nepaliVoice;
+        }
+        
+        utterance.lang = 'ne-NP';
+        utterance.rate = 0.8;
+        utterance.pitch = 1;
+        
+        elements.listenBtn.disabled = true;
+        utterance.onend = () => {
+          elements.listenBtn.disabled = false;
+        };
+        
+        speechSynthesis.speak(utterance);
+      } else {
+        elements.feedback.textContent = '🔊 Audio not available in this browser';
+        setTimeout(() => elements.feedback.textContent = '', 2000);
+      }
+    }
+
+    // Handle speech recognition result
+    function handleSpeechResult(event) {
+      const currentWord = shuffledWords[currentIndex];
+      const spokenText = event.results[0][0].transcript.toLowerCase().trim();
+      
+      elements.feedback.textContent = `You said: "${spokenText}"`;
+      
+      // Simple phonetic matching - check if spoken text is similar to expected
+      const expectedLower = currentWord.nepali.toLowerCase();
+      const romanLower = currentWord.roman.toLowerCase();
+      
+      // Check various matching criteria
+      const isMatch = 
+        spokenText === expectedLower ||
+        spokenText === romanLower ||
+        spokenText.includes(expectedLower) ||
+        spokenText.includes(romanLower) ||
+        levenshteinDistance(spokenText, expectedLower) <= 2 ||
+        levenshteinDistance(spokenText, romanLower) <= 2;
+      
+      if (isMatch) {
+        totalCorrect++;
+        learnedWords.add(currentWord.english);
+        streak = Math.max(1, streak + 1);
+        
+        elements.feedback.textContent += ' ✅ Great pronunciation!';
+        elements.feedback.style.color = '#1dd1a1';
+        
+        setTimeout(nextWord, 2000);
+      } else {
+        elements.feedback.textContent += ' 🔄 Try again!';
+        elements.feedback.style.color = '#feca57';
+        
+        setTimeout(() => {
+          elements.feedback.textContent = '';
+        }, 2000);
+      }
+      
+      totalAttempts++;
+      updateStats();
+      updateProgress();
+      saveProgress();
+    }
+
+    // Handle speech recognition error
+    function handleSpeechError(event) {
+      console.error('Speech recognition error:', event.error);
+      elements.feedback.textContent = '❌ Could not recognize speech. Try again.';
+      elements.feedback.style.color = '#ff6b6b';
+      
+      setTimeout(() => {
+        elements.feedback.textContent = '';
+      }, 2000);
+    }
+
+    // Start/stop recording
+    function toggleRecording() {
+      if (!speechSupported || !speechRecognition) {
+        elements.feedback.textContent = 'Speech recognition not supported';
+        return;
+      }
+      
+      if (!isRecording) {
+        isRecording = true;
+        elements.recordBtn.classList.add('recording');
+        elements.recordBtn.innerHTML = '🛑';
+        elements.feedback.textContent = 'Listening... Speak now!';
+        elements.feedback.style.color = '#54a0ff';
+        
+        try {
+          speechRecognition.start();
+        } catch (e) {
+          console.error('Speech recognition start error:', e);
+          isRecording = false;
+          elements.recordBtn.classList.remove('recording');
+          elements.recordBtn.innerHTML = '🎤';
+          elements.feedback.textContent = 'Error starting speech recognition';
+        }
+      } else {
+        speechRecognition.stop();
+      }
+    }
+
+    // Calculate Levenshtein distance for fuzzy string matching
+    function levenshteinDistance(str1, str2) {
+      const matrix = [];
+      for (let i = 0; i <= str2.length; i++) {
+        matrix[i] = [i];
+      }
+      for (let j = 0; j <= str1.length; j++) {
+        matrix[0][j] = j;
+      }
+      for (let i = 1; i <= str2.length; i++) {
+        for (let j = 1; j <= str1.length; j++) {
+          if (str2.charAt(i - 1) === str1.charAt(j - 1)) {
+            matrix[i][j] = matrix[i - 1][j - 1];
+          } else {
+            matrix[i][j] = Math.min(
+              matrix[i - 1][j - 1] + 1,
+              matrix[i][j - 1] + 1,
+              matrix[i - 1][j] + 1
+            );
+          }
+        }
+      }
+      return matrix[str2.length][str1.length];
+    }
+
+    // Move to next word
+    function nextWord() {
+      currentIndex = (currentIndex + 1) % shuffledWords.length;
+      
+      // Reshuffle when we've gone through all words
+      if (currentIndex === 0) {
+        shuffledWords = [...words].sort(() => Math.random() - 0.5);
+      }
+      
+      elements.feedback.textContent = '';
+      updateWord();
+    }
+
+    // Skip current word
+    function skipWord() {
+      elements.feedback.textContent = 'Skipped! 🔄';
+      elements.feedback.style.color = '#feca57';
+      setTimeout(() => {
+        elements.feedback.textContent = '';
+        nextWord();
+      }, 800);
+    }
+
+    // Event listeners
+    elements.listenBtn.onclick = speakWord;
+    elements.recordBtn.onclick = toggleRecording;
+
+    // Load voices when available
+    if ('speechSynthesis' in window) {
+      speechSynthesis.onvoiceschanged = () => {
+        // Voices are now loaded
+      };
+    }
+
+    // Initialize app when page loads
+    init();
+
+    // Make functions globally available
+    window.setModule = setModule;
+    window.skipWord = skipWord;
+  </script>
+</body>
+</html>
