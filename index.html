@@ -315,8 +315,14 @@
         <div id="fallbackMessage" class="fallback-message hidden">
           Speech recognition is not available in your browser. Please try Chrome or Edge for the best experience.
         </div>
-        <button class="record-btn" id="recordBtn" title="Hold to record your pronunciation">🎤</button>
-        <div>Hold the microphone button and speak the word</div>
+        <button class="record-btn" id="recordBtn" title="Record your pronunciation">🎤</button>
+        <div style="text-align: center; margin-top: 10px;">
+          <div>🎧 <strong>First:</strong> Listen to the pronunciation</div>
+          <div style="margin-top: 5px;">🎤 <strong>Then:</strong> Hold the mic button and speak</div>
+          <div style="font-size: 0.9em; opacity: 0.8; margin-top: 10px;">
+            <em>Practice mode works in all browsers!</em>
+          </div>
+        </div>
       </div>
       
       <div class="feedback" id="feedback"></div>
@@ -674,6 +680,108 @@
     let speechRecognition = null;
     let speechSupported = false;
 
+    // Audio feedback system
+    const audioContext = new (window.AudioContext || window.webkitAudioContext || null)();
+    
+    // Create audio feedback sounds
+    function playSuccessSound() {
+      if (!audioContext) return;
+      
+      // Correct answer sound - ascending chord progression
+      const notes = [523.25, 659.25, 783.99]; // C5, E5, G5
+      notes.forEach((freq, i) => {
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.frequency.setValueAtTime(freq, audioContext.currentTime + i * 0.1);
+        oscillator.type = 'sine';
+        
+        gainNode.gain.setValueAtTime(0, audioContext.currentTime + i * 0.1);
+        gainNode.gain.linearRampToValueAtTime(0.1, audioContext.currentTime + i * 0.1 + 0.05);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + i * 0.1 + 0.3);
+        
+        oscillator.start(audioContext.currentTime + i * 0.1);
+        oscillator.stop(audioContext.currentTime + i * 0.1 + 0.3);
+      });
+    }
+
+    function playErrorSound() {
+      if (!audioContext) return;
+      
+      // Incorrect answer sound - descending tone
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(200, audioContext.currentTime + 0.3);
+      oscillator.type = 'sawtooth';
+      
+      gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+      gainNode.gain.linearRampToValueAtTime(0.1, audioContext.currentTime + 0.05);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.3);
+    }
+
+    function playClickSound() {
+      if (!audioContext) return;
+      
+      // Soft click sound for button presses
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+      oscillator.type = 'sine';
+      
+      gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+      gainNode.gain.linearRampToValueAtTime(0.05, audioContext.currentTime + 0.01);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.1);
+    }
+
+    function playStreakSound() {
+      if (!audioContext) return;
+      
+      // Special sound for maintaining streak
+      const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+      notes.forEach((freq, i) => {
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.frequency.setValueAtTime(freq, audioContext.currentTime + i * 0.08);
+        oscillator.type = 'triangle';
+        
+        gainNode.gain.setValueAtTime(0, audioContext.currentTime + i * 0.08);
+        gainNode.gain.linearRampToValueAtTime(0.08, audioContext.currentTime + i * 0.08 + 0.03);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + i * 0.08 + 0.25);
+        
+        oscillator.start(audioContext.currentTime + i * 0.08);
+        oscillator.stop(audioContext.currentTime + i * 0.08 + 0.25);
+      });
+    }
+
+    // Initialize audio context on first user interaction
+    function initAudioContext() {
+      if (audioContext && audioContext.state === 'suspended') {
+        audioContext.resume();
+      }
+    }
+
     // DOM elements
     const elements = {
       nepaliText: document.getElementById('nepaliText'),
@@ -701,14 +809,22 @@
 
     // Check if speech recognition is supported
     function checkSpeechSupport() {
-      if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      // Check for different speech recognition APIs
+      const hasWebkitSpeech = 'webkitSpeechRecognition' in window;
+      const hasSpeech = 'SpeechRecognition' in window;
+      const hasMediaDevices = navigator.mediaDevices && navigator.mediaDevices.getUserMedia;
+      
+      if (hasWebkitSpeech || hasSpeech) {
         speechSupported = true;
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         speechRecognition = new SpeechRecognition();
         speechRecognition.continuous = false;
         speechRecognition.interimResults = false;
         speechRecognition.maxAlternatives = 3;
-        speechRecognition.lang = 'ne-NP';
+        
+        // Try multiple language codes for better compatibility
+        const languageCodes = ['ne-NP', 'ne', 'hi-IN', 'en-US'];
+        speechRecognition.lang = languageCodes[0];
         
         speechRecognition.onresult = handleSpeechResult;
         speechRecognition.onerror = handleSpeechError;
@@ -717,6 +833,9 @@
           elements.recordBtn.classList.remove('recording');
           elements.recordBtn.innerHTML = '🎤';
         };
+      } else if (hasMediaDevices) {
+        // Fallback: Basic audio recording for Firefox
+        speechSupported = 'fallback';
       } else {
         speechSupported = false;
       }
@@ -792,8 +911,24 @@
       } else {
         elements.optionsGrid.style.display = 'none';
         elements.speakingControls.classList.add('active');
-        if (!speechSupported) {
+        
+        // Show appropriate message based on browser support
+        if (speechSupported === false) {
+          elements.fallbackMessage.innerHTML = `
+            <strong>Speech recognition not available</strong><br>
+            Try Chrome, Edge, or Safari for full speech features.<br>
+            <em>You can still use the listening mode to practice pronunciation!</em>
+          `;
           elements.fallbackMessage.classList.remove('hidden');
+        } else if (speechSupported === 'fallback') {
+          elements.fallbackMessage.innerHTML = `
+            <strong>Limited speech support detected</strong><br>
+            This browser has partial speech support. Try Chrome or Edge for the best experience.<br>
+            <em>Listen and repeat mode available below!</em>
+          `;
+          elements.fallbackMessage.classList.remove('hidden');
+        } else {
+          elements.fallbackMessage.classList.add('hidden');
         }
       }
       
@@ -842,6 +977,7 @@
 
     // Handle answer selection
     function handleAnswer(choice, cardElement) {
+      initAudioContext(); // Initialize audio on user interaction
       const currentWord = shuffledWords[currentIndex];
       const isCorrect = choice === currentWord.english;
       
@@ -850,11 +986,24 @@
       if (isCorrect) {
         totalCorrect++;
         learnedWords.add(currentWord.english);
+        const previousStreak = streak;
         streak = Math.max(1, streak + 1);
         
         cardElement.classList.add('correct');
         elements.feedback.textContent = '✅ Excellent!';
         elements.feedback.style.color = '#1dd1a1';
+        
+        // Play appropriate success sound
+        if (streak > previousStreak && streak % 5 === 0) {
+          playStreakSound(); // Special sound for streak milestones
+        } else {
+          playSuccessSound(); // Regular success sound
+        }
+        
+        // Show streak celebration for milestones
+        if (streak > 0 && streak % 5 === 0) {
+          elements.feedback.textContent = `🔥 ${streak} streak! Amazing!`;
+        }
         
         // Disable all options
         document.querySelectorAll('.option-card').forEach(card => {
@@ -866,6 +1015,9 @@
         cardElement.classList.add('incorrect');
         elements.feedback.textContent = '❌ Try again!';
         elements.feedback.style.color = '#ff6b6b';
+        
+        // Play error sound
+        playErrorSound();
         
         // Disable this option but allow others
         cardElement.style.pointerEvents = 'none';
@@ -882,6 +1034,8 @@
 
     // Text-to-speech function
     function speakWord() {
+      initAudioContext(); // Initialize audio on user interaction
+      
       if ('speechSynthesis' in window) {
         speechSynthesis.cancel(); // Cancel any ongoing speech
         
@@ -907,9 +1061,14 @@
           elements.listenBtn.disabled = false;
         };
         
+        utterance.onstart = () => {
+          playClickSound(); // Soft click when audio starts
+        };
+        
         speechSynthesis.speak(utterance);
       } else {
         elements.feedback.textContent = '🔊 Audio not available in this browser';
+        playErrorSound();
         setTimeout(() => elements.feedback.textContent = '', 2000);
       }
     }
@@ -937,15 +1096,27 @@
       if (isMatch) {
         totalCorrect++;
         learnedWords.add(currentWord.english);
+        const previousStreak = streak;
         streak = Math.max(1, streak + 1);
         
         elements.feedback.textContent += ' ✅ Great pronunciation!';
         elements.feedback.style.color = '#1dd1a1';
         
+        // Play appropriate success sound
+        if (streak > previousStreak && streak % 5 === 0) {
+          playStreakSound(); // Special sound for streak milestones
+          elements.feedback.textContent = `🔥 ${streak} streak! Perfect pronunciation!`;
+        } else {
+          playSuccessSound(); // Regular success sound
+        }
+        
         setTimeout(nextWord, 2000);
       } else {
         elements.feedback.textContent += ' 🔄 Try again!';
         elements.feedback.style.color = '#feca57';
+        
+        // Play gentle error sound (softer for speech attempts)
+        playErrorSound();
         
         setTimeout(() => {
           elements.feedback.textContent = '';
@@ -971,29 +1142,88 @@
 
     // Start/stop recording
     function toggleRecording() {
-      if (!speechSupported || !speechRecognition) {
-        elements.feedback.textContent = 'Speech recognition not supported';
-        return;
+      if (speechSupported === true && speechRecognition) {
+        // Full speech recognition available
+        if (!isRecording) {
+          isRecording = true;
+          elements.recordBtn.classList.add('recording');
+          elements.recordBtn.innerHTML = '🛑';
+          elements.feedback.textContent = 'Listening... Speak now!';
+          elements.feedback.style.color = '#54a0ff';
+          
+          try {
+            speechRecognition.start();
+          } catch (e) {
+            console.error('Speech recognition start error:', e);
+            isRecording = false;
+            elements.recordBtn.classList.remove('recording');
+            elements.recordBtn.innerHTML = '🎤';
+            elements.feedback.textContent = 'Error starting speech recognition';
+          }
+        } else {
+          speechRecognition.stop();
+        }
+      } else if (speechSupported === 'fallback') {
+        // Fallback mode for Firefox - provide visual feedback and encouragement
+        handleFallbackRecording();
+      } else {
+        // No speech support
+        elements.feedback.textContent = 'Speech recognition not supported in this browser. Try Chrome, Edge, or Safari.';
+        elements.feedback.style.color = '#ff6b6b';
+        setTimeout(() => elements.feedback.textContent = '', 3000);
       }
-      
+    }
+
+    // Fallback recording for browsers with limited speech support
+    function handleFallbackRecording() {
       if (!isRecording) {
         isRecording = true;
         elements.recordBtn.classList.add('recording');
         elements.recordBtn.innerHTML = '🛑';
-        elements.feedback.textContent = 'Listening... Speak now!';
+        elements.feedback.textContent = '🎤 Recording... Say the word aloud!';
         elements.feedback.style.color = '#54a0ff';
         
-        try {
-          speechRecognition.start();
-        } catch (e) {
-          console.error('Speech recognition start error:', e);
+        playClickSound(); // Audio feedback for starting recording
+        
+        // Simulate recording for 3 seconds, then provide encouragement
+        setTimeout(() => {
           isRecording = false;
           elements.recordBtn.classList.remove('recording');
           elements.recordBtn.innerHTML = '🎤';
-          elements.feedback.textContent = 'Error starting speech recognition';
-        }
+          
+          const currentWord = shuffledWords[currentIndex];
+          elements.feedback.innerHTML = `
+            Great practice! 👏<br>
+            You practiced: <strong>${currentWord.nepali}</strong> (${currentWord.roman})<br>
+            <em>Keep practicing your pronunciation!</em>
+          `;
+          elements.feedback.style.color = '#1dd1a1';
+          
+          // Play success sound for practice
+          playSuccessSound();
+          
+          // Count as practice (not fully correct, but engagement)
+          totalAttempts++;
+          learnedWords.add(currentWord.english);
+          updateStats();
+          updateProgress();
+          saveProgress();
+          
+          setTimeout(() => {
+            nextWord();
+          }, 3000);
+        }, 3000);
       } else {
-        speechRecognition.stop();
+        // Stop recording early
+        isRecording = false;
+        elements.recordBtn.classList.remove('recording');
+        elements.recordBtn.innerHTML = '🎤';
+        elements.feedback.textContent = 'Recording stopped. Try again!';
+        elements.feedback.style.color = '#feca57';
+        
+        playClickSound(); // Soft click for stopping
+        
+        setTimeout(() => elements.feedback.textContent = '', 2000);
       }
     }
 
