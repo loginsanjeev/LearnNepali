@@ -327,11 +327,37 @@
       
       <div class="feedback" id="feedback"></div>
       
+
+      
       <button class="skip-btn" id="skipBtn" onclick="skipWord()">Skip Word</button>
     </div>
   </div>
 
   <script>
+    // Audio mapping for native speaker recordings (your recordings)
+    const audioMapping = {
+      "hello": "audio/hello.mp3",
+      "thank you": "audio/thank_you.mp3",
+      "sorry": "audio/sorry.mp3",
+      "yes": "audio/yes.mp3",
+      "no": "audio/no.mp3",
+      "one": "audio/one.mp3",
+      "two": "audio/two.mp3",
+      "three": "audio/three.mp3",
+      "mother": "audio/mother.mp3",
+      "father": "audio/father.mp3",
+      "water": "audio/water.mp3",
+      "food": "audio/food.mp3",
+      "rice": "audio/rice.mp3",
+      "lentils": "audio/lentils.mp3",
+      "mouth": "audio/mouth.mp3",
+      "hand": "audio/hand.mp3",
+      "eyes": "audio/eyes.mp3",
+      "ear": "audio/ear.mp3",
+      "nose": "audio/nose.mp3",
+      "house": "audio/house.mp3"
+    };
+
     // Complete 500-word Nepali vocabulary dataset
     const words = [
       // Greetings & Basic Phrases
@@ -908,7 +934,7 @@
         elements.optionsGrid.style.display = 'grid';
         elements.speakingControls.classList.remove('active');
         elements.fallbackMessage.classList.add('hidden');
-      } else {
+      } else if (module === 'speaking') {
         elements.optionsGrid.style.display = 'none';
         elements.speakingControls.classList.add('active');
         
@@ -1032,15 +1058,58 @@
       saveProgress();
     }
 
-    // Text-to-speech function
+    // Enhanced text-to-speech function with native audio support
     function speakWord() {
       initAudioContext(); // Initialize audio on user interaction
       
+      const currentWord = shuffledWords[currentIndex];
+      const audioFile = audioMapping[currentWord.english.toLowerCase()];
+      
+      if (audioFile) {
+        // Play native audio if available
+        playNativeAudio(audioFile);
+      } else {
+        // Fallback to TTS
+        playTTSAudio(currentWord);
+      }
+    }
+
+    // Play native speaker audio
+    function playNativeAudio(audioFile) {
+      const audio = new Audio(audioFile);
+      elements.listenBtn.disabled = true;
+      
+      audio.onloadstart = () => {
+        playClickSound(); // Soft click when audio starts loading
+      };
+      
+      audio.onended = () => {
+        elements.listenBtn.disabled = false;
+      };
+      
+      audio.onerror = (e) => {
+        console.error('Native audio error:', e);
+        elements.listenBtn.disabled = false;
+        // Fallback to TTS if native audio fails
+        const currentWord = shuffledWords[currentIndex];
+        playTTSAudio(currentWord);
+      };
+      
+      audio.play().catch(e => {
+        console.error('Audio play error:', e);
+        elements.listenBtn.disabled = false;
+        // Fallback to TTS
+        const currentWord = shuffledWords[currentIndex];
+        playTTSAudio(currentWord);
+      });
+    }
+
+    // Play TTS audio
+    function playTTSAudio(word) {
       if ('speechSynthesis' in window) {
         speechSynthesis.cancel(); // Cancel any ongoing speech
         
-        const currentWord = shuffledWords[currentIndex];
-        const utterance = new SpeechSynthesisUtterance(currentWord.nepali);
+        const utterance = new SpeechSynthesisUtterance(word.nepali);
         
         // Try to find Nepali voice, fallback to default
         const voices = speechSynthesis.getVoices();
@@ -1288,6 +1357,8 @@
 
     // Initialize app when page loads
     init();
+
+
 
     // Make functions globally available
     window.setModule = setModule;
