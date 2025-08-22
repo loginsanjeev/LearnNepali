@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nepali Word Recorder</title>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      max-width: 600px; 
+      margin: 0 auto; 
+      padding: 20px;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: white;
+      min-height: 100vh;
+    }
+    .word-card {
+      background: rgba(255,255,255,0.1);
+      padding: 20px;
+      margin: 10px 0;
+      border-radius: 10px;
+      text-align: center;
+    }
+    .nepali { font-size: 2rem; margin: 10px 0; }
+    .english { font-size: 1.2rem; opacity: 0.8; }
+    .roman { font-size: 1rem; opacity: 0.6; }
+    button {
+      padding: 10px 20px;
+      margin: 5px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .record-btn { background: #ff6b6b; color: white; }
+    .record-btn.recording { background: #ff3838; animation: pulse 1s infinite; }
+    .play-btn { background: #1dd1a1; color: white; }
+    .download-btn { background: #54a0ff; color: white; }
+    .status { margin: 10px 0; font-weight: bold; }
+    .completed { background: rgba(29, 209, 161, 0.2); }
+    @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+    #csvOutput { 
+      background: rgba(0,0,0,0.3); 
+      padding: 15px; 
+      border-radius: 5px; 
+      margin: 20px 0;
+      font-family: monospace;
+      font-size: 12px;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎤 Nepali Word Recorder</h1>
+  <p>Record clear pronunciation for each word. Click Record → Speak → Stop → Download</p>
+  <div id="micStatus" style="padding: 10px; margin: 10px 0; background: rgba(255,193,7,0.2); border-radius: 5px; text-align: center;">
+    🎤 Click any Record button to enable microphone (one-time permission)
+  </div>
+  
+  <div id="wordsList"></div>
+  
+  <div style="margin: 30px 0; padding: 20px; background: rgba(255,255,255,0.1); border-radius: 10px;">
+    <h3>📋 CSV Mapping Output:</h3>
+    <div id="csvOutput">english,nepali,roman,audio_file
+</div>
+    <button onclick="copyCsv()" style="background: #feca57; color: black;">📋 Copy CSV</button>
+  </div>
+
+  <script>
+    const words = [
+      { nepali: "नमस्ते", roman: "Namaste", english: "Hello" },
+      { nepali: "धन्यवाद", roman: "Dhanyabad", english: "Thank you" },
+      { nepali: "माफ गर्नुहोस्", roman: "Maaf garnuhos", english: "Sorry" },
+      { nepali: "हो", roman: "Ho", english: "Yes" },
+      { nepali: "होइन", roman: "Hoina", english: "No" },
+      { nepali: "एक", roman: "Ek", english: "One" },
+      { nepali: "दुई", roman: "Dui", english: "Two" },
+      { nepali: "तीन", roman: "Teen", english: "Three" },
+      { nepali: "आमा", roman: "Aama", english: "Mother" },
+      { nepali: "बुवा", roman: "Buwa", english: "Father" },
+      { nepali: "पानी", roman: "Pani", english: "Water" },
+      { nepali: "खाना", roman: "Khana", english: "Food" },
+      { nepali: "भात", roman: "Bhaat", english: "Rice" },
+      { nepali: "दाल", roman: "Daal", english: "Lentils" },
+      { nepali: "मुख", roman: "Mukh", english: "Mouth" },
+      { nepali: "हात", roman: "Haat", english: "Hand" },
+      { nepali: "आँखा", roman: "Aankha", english: "Eyes" },
+      { nepali: "कान", roman: "Kaan", english: "Ear" },
+      { nepali: "नाक", roman: "Naak", english: "Nose" },
+      { nepali: "घर", roman: "Ghar", english: "House" }
+    ];
+
+    let mediaRecorder;
+    let audioChunks = [];
+    let recordings = {};
+    let audioStream = null;
+
+    function createWordCards() {
+      const container = document.getElementById('wordsList');
+      
+      words.forEach((word, index) => {
+        const card = document.createElement('div');
+        card.className = 'word-card';
+        card.id = `word-${index}`;
+        
+        card.innerHTML = `
+          <div class="nepali">${word.nepali}</div>
+          <div class="english">${word.english}</div>
+          <div class="roman">${word.roman}</div>
+          <div class="status" id="status-${index}">Ready to record</div>
+          <button class="record-btn" id="record-${index}" onclick="toggleRecord(${index})">🎤 Record</button>
+          <button class="play-btn" id="play-${index}" onclick="playRecording(${index})" disabled>▶️ Play</button>
+          <button class="download-btn" id="download-${index}" onclick="downloadRecording(${index})" disabled>💾 Download</button>
+        `;
+        
+        container.appendChild(card);
+      });
+    }
+
+    async function initMicrophone() {
+      if (!audioStream) {
+        try {
+          audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          document.getElementById('micStatus').textContent = '✅ Microphone ready - You can now record!';
+          document.getElementById('micStatus').style.color = '#1dd1a1';
+        } catch (err) {
+          document.getElementById('micStatus').textContent = '❌ Microphone access denied';
+          document.getElementById('micStatus').style.color = '#ff6b6b';
+          console.error('Error accessing microphone:', err);
+        }
+      }
+    }
+
+    async function toggleRecord(index) {
+      const recordBtn = document.getElementById(`record-${index}`);
+      const status = document.getElementById(`status-${index}`);
+      
+      // Initialize microphone if not done
+      if (!audioStream) {
+        await initMicrophone();
+        if (!audioStream) return;
+      }
+      
+      if (!mediaRecorder || mediaRecorder.state === 'inactive') {
+        // Start recording
+        mediaRecorder = new MediaRecorder(audioStream);
+        audioChunks = [];
+        
+        mediaRecorder.ondataavailable = (event) => {
+          audioChunks.push(event.data);
+        };
+        
+        mediaRecorder.onstop = () => {
+          const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+          recordings[index] = audioBlob;
+          
+          // Update UI
+          document.getElementById(`play-${index}`).disabled = false;
+          document.getElementById(`download-${index}`).disabled = false;
+          document.getElementById(`word-${index}`).classList.add('completed');
+          status.textContent = '✅ Recorded successfully';
+          recordBtn.textContent = '🎤 Record';
+          recordBtn.classList.remove('recording');
+          
+          updateCsvOutput();
+        };
+        
+        mediaRecorder.start();
+        recordBtn.textContent = '🛑 Stop';
+        recordBtn.classList.add('recording');
+        status.textContent = '🔴 Recording... Speak now!';
+        
+      } else {
+        // Stop recording
+        mediaRecorder.stop();
+      }
+    }
+
+    function playRecording(index) {
+      if (recordings[index]) {
+        const audio = new Audio(URL.createObjectURL(recordings[index]));
+        audio.play();
+      }
+    }
+
+    function downloadRecording(index) {
+      if (recordings[index]) {
+        const word = words[index];
+        const filename = `${word.english.toLowerCase().replace(' ', '_')}.mp3`;
+        
+        const url = URL.createObjectURL(recordings[index]);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+    }
+
+    function updateCsvOutput() {
+      let csv = 'english,nepali,roman,audio_file\n';
+      
+      words.forEach((word, index) => {
+        if (recordings[index]) {
+          const filename = `${word.english.toLowerCase().replace(' ', '_')}.mp3`;
+          csv += `"${word.english}","${word.nepali}","${word.roman}","audio/${filename}"\n`;
+        }
+      });
+      
+      document.getElementById('csvOutput').textContent = csv;
+    }
+
+    function copyCsv() {
+      const csvText = document.getElementById('csvOutput').textContent;
+      navigator.clipboard.writeText(csvText).then(() => {
+        alert('CSV copied to clipboard!');
+      });
+    }
+
+    // Initialize
+    createWordCards();
+  </script>
+</body>
+</html>
